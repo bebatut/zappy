@@ -5,6 +5,18 @@ import zarr
 from zap.base import *  # include everything in zap.base and hence base numpy
 from zap.executor.dag import DAG
 
+"""Small wrapper to make a Pywren executor behave like a concurrent.futures.Executor."""
+
+
+class PywrenExecutorWrapper(object):
+    def __init__(self, pywren_executor):
+        self.pywren_executor = pywren_executor
+
+    def map(self, func, iterables):
+        import pywren
+
+        return pywren.get_all_results(self.pywren_executor.map(func, iterables))
+
 
 class ndarray_executor(ndarray_dist):
     """A numpy.ndarray backed by chunked storage"""
